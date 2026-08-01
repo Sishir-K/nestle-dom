@@ -70,4 +70,34 @@ for quantum-inspired and simulator-based approaches.
 
 ## Results
 
-*(to be completed once the QUBO is built and solved)*
+Both quantum-inspired methods were run 5 times each (Simulated Annealing:
+`num_reads=1000`; Tabu Search: `num_reads=100`) to account for their
+stochastic nature, and compared against the QUBO's true optimum (computable
+directly for this problem structure, since orders are independent) and the
+exact MILP solution from Task 3.
+
+| Method | Mean profit | Best | Worst | Gap from optimum (mean) | Gap % |
+|---|---|---|---|---|---|
+| MILP (exact, Task 3) | 2,188,899.66 | — | — | 0 | 0% |
+| Simulated Annealing | 2,047,885.74 | 2,065,183.14 | 1,992,813.51 | 141,013.92 | 6.4% |
+| Tabu Search | 2,041,808.38 | 2,092,147.42 | 1,969,478.29 | 147,091.28 | 6.7% |
+
+**Interpretation:** Both quantum-inspired methods converge to within ~6-7%
+of the true optimum on average, confirming the QUBO formulation is sound
+and both methods are effective heuristics for this problem. Tabu Search
+showed a wider spread between best and worst runs but achieved the closest
+single-run result to the true optimum (2,092,147.42, a 4.4% gap). Simulated
+Annealing showed more consistent (lower-variance) performance across runs.
+Neither method reliably matches the MILP's exact optimum in a single run,
+which is expected — both are heuristic methods offering no optimality
+guarantee, trading solution quality for the ability to scale to problem
+sizes where exact MILP solving becomes computationally intractable.
+
+**Important caveat:** this QUBO formulation optimizes each order's DC
+assignment independently (no shared inventory or dock capacity constraints
+across orders), which is a simplification relative to the full MILP. As a
+result, this comparison measures how well each method solves the
+*QUBO's own objective*, not how well the QUBO formulation itself
+approximates the full DOM problem. This distinction is discussed further
+under Limitations.
+
