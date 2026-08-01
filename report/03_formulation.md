@@ -101,6 +101,22 @@ identified and resolved during implementation:
    `Order_SKU_Revenue / OrderedQty_converted` for use in the objective
    function.
 
+## Scaling Validation
+
+The formulation was tested at increasing scale to confirm robustness before
+selecting a final tractable subset size:
+
+| Orders | Order-SKU lines | x vars | f vars | Solve time | Status | Fill rate |
+|---|---|---|---|---|---|---|
+| 20 | 553 | 240 | 6,636 | <1s | Optimal | 97.8% |
+| 100 | 2,460 | 1,200 | 29,520 | 9.4s | Optimal | 97.42% |
+| 300 | 6,801 | 3,600 | 81,612 | 51.8s | Optimal | 96.99% |
+
+Solve time grows faster than linearly with order count, consistent with
+typical MILP behavior. 300 orders (~27% of the full 1,109-order dataset) was
+selected as the final tractable subset for detailed baseline comparison,
+balancing solution scale against solve time and remaining project timeline.
+
 ## Path to Quantum-Inspired Solving (Task 4 preview)
 
 This formulation is linear with no bilinear (variable × variable) terms,
