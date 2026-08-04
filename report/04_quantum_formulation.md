@@ -98,6 +98,7 @@ assignment independently (no shared inventory or dock capacity constraints
 across orders), which is a simplification relative to the full MILP. As a
 result, this comparison measures how well each method solves the
 *QUBO's own objective*, not how well the QUBO formulation itself
-approximates the full DOM problem. This distinction is discussed further
-under Limitations.
+approximates the full DOM problem. A subsequent extension attempting to add
+inventory coupling — and the technical limitation encountered — is
+documented in `05_coupled_qubo_extension.md`.
 
