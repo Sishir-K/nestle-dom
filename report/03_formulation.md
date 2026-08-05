@@ -70,6 +70,15 @@ Maximize:
   processing order may have been better allocated elsewhere.
 - This MILP formulation, solved exactly, provides the true optimal benchmark
   that both baselines are compared against in later sections.
+- The default and greedy baselines were computed across the full 1,109-order
+  dataset from the start. The MILP was validated on progressively larger
+  subsets (20 / 100 / 300 orders) before being solved on the full dataset
+  (see Scaling Validation below). With the full-dataset MILP result now
+  available ($84,666,068.27 profit, 97.17% fill rate), all three methods
+  can be compared directly on identical, dataset-wide numbers for the
+  first time — the MILP result serves as the true optimal benchmark
+  against which the default and greedy baselines' full-dataset profit
+  and fill rate gaps can now be reported.
 
 ## Assumptions
 
@@ -103,21 +112,73 @@ identified and resolved during implementation:
 
 ## Scaling Validation
 
-The formulation was tested at increasing scale to confirm robustness before
-selecting a final tractable subset size:
+The formulation was tested at increasing scale to confirm robustness, then
+solved on the full dataset:
 
 | Orders | Order-SKU lines | x vars | f vars | Solve time | Status | Fill rate |
 |---|---|---|---|---|---|---|
 | 20 | 553 | 240 | 6,636 | <1s | Optimal | 97.8% |
 | 100 | 2,460 | 1,200 | 29,520 | 9.4s | Optimal | 97.42% |
 | 300 | 6,801 | 3,600 | 81,612 | 51.8s | Optimal | 96.99% |
+| 1,109 (full) | 25,193 | 13,308 | 302,316 | 410.2s | Optimal | 97.17% |
 
 Solve time grows faster than linearly with order count, consistent with
 typical MILP behavior. 300 orders (~27% of the full 1,109-order dataset) was
-selected as the final tractable subset for detailed baseline comparison,
-balancing solution scale against solve time and remaining project timeline.
+validated as a tractable subset early in the project; the full 1,109-order
+dataset was subsequently solved directly (row above) to genuine optimality
+(not a gap-limited cutoff), providing an exact optimal benchmark at full
+scale rather than a subset extrapolation.
 
-## Path to Quantum-Inspired Solving (Task 4 preview)
+**Full-dataset result:**
+- Status: Optimal (solved exactly, not gap-terminated)
+- Objective value (revenue − penalty − shipping): $84,666,068.27
+- Total cases filled: 2,279,299 / 2,345,613 demanded (97.17% fill rate)
+- Fill rate is consistent with the 20/100/300-order runs (97.8%, 97.42%,
+  96.99%), confirming inventory and dock capacity are not a materially
+  tighter bottleneck at full scale. Average profit per order ($76,344) is
+  lower than in the 20-order sample ($109,445), which reflects the full
+  dataset's broader mix of orders (including lower-margin and higher
+  penalty-exposure orders) rather than any degradation in solution quality.
+
+## Baseline Comparison (Full Dataset, 1,109 Orders)
+
+With the full-dataset MILP solved and both baselines corrected for a
+shipping-cost double-counting bug (shipping is a per-order cost, not a
+per-SKU-line cost — see note below), all three methods can now be compared
+directly on identical dataset-wide numbers:
+
+| Method | Revenue | Penalty | Shipping | Profit | Fill rate | Gap vs. MILP |
+|---|---|---|---|---|---|---|
+| Default assignment | $84,915,014.38 | $7,600,586.25 | $1,386,508.00 | $75,927,920.13 | 95.82% | −$8,738,148.14 (−10.32%) |
+| Greedy reassignment | $87,092,157.33 | $2,731,905.98 | $3,221,692.00 | $81,138,559.36 | 98.30% | −$3,527,508.91 (−4.17%) |
+| **MILP (exact)** | — | — | — | **$84,666,068.27** | 97.17% | 0 (optimal) |
+
+**Interpretation:** The greedy heuristic (849 reassignments across 1,109
+orders) recovers most of the profit gap left by naive default assignment,
+landing within ~4.2% of the true optimum — a reasonable result for a fast,
+local heuristic. Notably, greedy's fill rate (98.30%) is *higher* than the
+MILP's (97.17%), even though its profit is lower: the MILP maximizes profit,
+not fill rate, and can rationally leave lower-value demand unfilled when the
+penalty cost of doing so is cheaper than the shipping cost required to fill
+it. This is expected behavior, not an error.
+
+**Modeling note — greedy vs. MILP order-splitting:** the greedy heuristic
+reassigns at the individual SKU-line level, so an order can end up split
+across multiple DCs (228 of 419 reassignment-affected orders were split
+across more than one DC). The MILP and default baseline both enforce
+"exactly one DC per order" by constraint. This is a genuine structural
+difference between the greedy heuristic and the other two methods, not a
+bug — it is disclosed here rather than forced into single-DC form, since
+constraining greedy to match would change what heuristic is actually being
+evaluated.
+
+**Data correction note:** an earlier version of the baseline shipping-cost
+calculation summed `Shipping_Cost` once per order-*SKU-line* rather than
+once per order actually shipped from a given DC, which multiply-counted
+shipping for any order with more than one SKU line (inflating default and
+greedy shipping to $32.2M and $33.7M respectively). Both were corrected to
+charge shipping once per (order, DC) pair actually used.
+
 
 This formulation is linear with no bilinear (variable × variable) terms,
 making it directly solvable via classical MILP solvers (PuLP/OR-Tools).
@@ -125,4 +186,3 @@ For the quantum-inspired implementation, constraints 1–5 will be reformulated
 as penalty terms added to the objective, converting this into a Quadratic
 Unconstrained Binary Optimization (QUBO) problem suitable for solving via
 simulated annealing (`dimod`/`neal`).
-
