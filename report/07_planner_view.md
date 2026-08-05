@@ -41,9 +41,15 @@ sometimes chooses *not* to chase every last unit of demand, because the
 shipping cost to do so would outweigh the penalty for leaving it unfilled.
 It's optimizing for profit, not just for filling orders.
 
+## What This Costs in Time
+
+- The "quick fix" approach is instant.
+- The "full picture" approach (guaranteed best answer) took about 7 minutes
+  to run on our full order volume — a real but manageable cost for a
+  meaningfully better result.
 - We also tested a faster, "good enough" version (inspired by quantum
   computing techniques) that performed very well at smaller order volumes
-  — reaching 91-97% of the best possible profit in well under a minute.
+  — reaching 91-95% of the best possible profit in well under a minute.
   At full volume, though, treating all 1,109 orders as one giant decision
   turned out to be the wrong approach: a small number of orders (17-23)
   were mishandled, and it actually became *slower* than the full-picture
@@ -53,8 +59,9 @@ It's optimizing for profit, not just for filling orders.
   solving it all at once) fixed most of the problem: mishandled orders
   dropped from 17-23 down to 5, and solve time came back down to about
   10 minutes. This method still doesn't quite match the full-picture
-  optimizer's profit, but the fix itself is a genuinely useful finding —
-  it points directly at how to make this faster method reliable at scale.
+  optimizer's profit (about 87% of it, even after the fix), but the fix
+  itself is a genuinely useful finding — it points directly at how to make
+  this faster method reliable at scale.
 
 ## Bottom Line for Decision-Makers
 
