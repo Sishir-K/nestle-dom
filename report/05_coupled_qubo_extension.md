@@ -87,7 +87,30 @@ modeling simplification.
 After diagnosing a constraint-interaction limitation in the initial
 per-SKU-line coupled formulation, aggregating constraints to the
 (order, DC) level produced a working, correctly-constrained coupled QUBO
-achieving ~97% of the exact MILP's optimal profit. This represents a
-genuine extension beyond the independent-order QUBO (Section 04), properly
-accounting for orders competing for shared inventory, while remaining
-solvable via local quantum-inspired heuristics (Simulated Annealing).
+achieving ~97% of the exact MILP's optimal profit at 20-order scale. This
+represents a genuine extension beyond the independent-order QUBO
+(Section 04), properly accounting for orders competing for shared
+inventory, while remaining solvable via local quantum-inspired heuristics
+(Simulated Annealing).
+
+## A Note on Scale
+
+The aggregation fix above was validated at 20 orders. It holds up cleanly
+through 100 orders as well — zero violations, 91-95% of the MILP's optimal
+profit across the range (see `06_scaling_analysis.md`, Section 2). At the
+full 1,109-order dataset, though, this same aggregated approach does *not*
+fully hold: a small number of violations (17-23 orders, ~2%) reappear, and
+solve time (788-857s) grows past the MILP's own full-scale solve time
+(410.2s). This is the same underlying constraint-interaction limitation
+described above, reduced in severity by aggregation but not eliminated at
+this size.
+
+A further fix — decomposing the problem by shipping date, since inventory
+constraints only ever link orders sharing the same DC, SKU, *and* date —
+reduces violations to 5 and brings solve time back down to 589.4s, at
+87.4% of the MILP's optimal profit. This is a meaningful improvement, but
+not a complete resolution: the coupled QUBO approach documented in this
+section should be read as validated at small-to-medium scale (≤100
+orders), with a disclosed, only partially-resolved limitation at full
+production scale. Full details, including why the residual violations are
+structural rather than solver-related, are in `06_scaling_analysis.md`.
