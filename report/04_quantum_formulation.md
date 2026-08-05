@@ -100,4 +100,4 @@ result, this comparison measures how well each method solves the
 *QUBO's own objective*, not how well the QUBO formulation itself
 approximates the full DOM problem. A subsequent extension attempting to add
 inventory coupling — and the technical limitation encountered — is
-documented in `04_coupled_qubo_extension.md`.
+documented in `05_coupled_qubo_extension.md`.

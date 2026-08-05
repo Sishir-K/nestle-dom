@@ -6,7 +6,7 @@ formulation. *(Column definitions cross-referenced against the challenge's
 data dictionary.)*
 
 For each file, **"Used in current model"** lists only the columns that
-actually appear as parameters in `01_mathematical_formulation.md`.
+actually appear as parameters in `03_formulation.md`.
 **"Present but not used"** lists columns that exist in the data pack but were
 deliberately excluded — either because the model's scope doesn't need them,
 or (for case-pick/pallet-pick throughput and the two-tier penalty structure)
