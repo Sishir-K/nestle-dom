@@ -60,11 +60,20 @@ solver might become too slow to use in daily operations.
 
 This is exactly why heuristic and quantum-inspired methods matter, even
 though they don't guarantee the perfect answer. In our own testing, a
-quantum-inspired solver (simulated annealing) reached about 91-97% of the
-MILP's exact optimal profit, but generally solved faster and scaled more
-predictably as the number of orders grew. The trade-off is real and
-measurable: give up a small amount of solution quality in exchange for
-speed and better scalability.
+quantum-inspired solver (simulated annealing) reached about 91-95% of the
+MILP's exact optimal profit at smaller scales (up to 100 orders), where it
+also solved faster than the MILP. At full scale, this advantage did not
+hold: a real bug in how the solver's constraints combine caused the
+quantum-inspired method's accuracy to drop and its solve time to grow
+slower than the MILP's. We traced this to the same underlying issue as a
+bug we found and partly fixed earlier in the project, and a targeted
+fix — splitting the problem by date — recovered some, but not all, of the
+lost performance, landing at about 87% of the MILP's optimal profit. This
+is an honest, useful finding in its own right: it shows that
+quantum-inspired methods aren't simply "faster but slightly worse" at
+every scale — their practical usefulness depends heavily on how the
+problem is decomposed, and that trade-off needs to be evaluated at the
+scale you actually intend to run at, not extrapolated from a smaller test.
 
 ## Exact methods vs. heuristics
 

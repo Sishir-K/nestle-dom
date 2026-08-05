@@ -147,10 +147,10 @@ the underlying limitation of global-penalty CQM-to-BQM conversion entirely.
 At full production scale, this method would need either per-constraint
 penalty tuning (a more rigorous version of Recommendation 1 below) or
 acceptance of a small, quantifiable violation rate as a practical
-trade-off — and, given the full-scale solve time now exceeds the MILP's,
-the case for using this QUBO/BQM approach at true full scale weakens
-considerably compared to the clear speed advantage it showed at 20-100
-orders.
+trade-off — and, given the full-scale solve time (even decomposed) still
+exceeds the MILP's, the case for using this QUBO/BQM approach at true full
+scale weakens considerably compared to the clear speed advantage it showed
+at 20-100 orders.
 
 ## 3. Runtime, Complexity, and Robustness Limitations
 
@@ -181,11 +181,17 @@ orders.
   orders, but this trend reversed at full scale — the QUBO/BQM approach
   took longer (788-857s) than the MILP (410.2s) at 1,109 orders, likely
   driven by growing constraint/interaction density rather than variable
-  count alone.
+  count alone. Per-date decomposition (Section 2) reduced this
+  disadvantage — 589.4s vs. the single-BQM's 788-857s — but did not
+  eliminate it; the QUBO/BQM approach remained slower than the MILP's
+  410.2s even after decomposition.
 - Solution quality: the aggregated coupled QUBO reached ~91-95% of optimal
   profit at 20-100 orders, but this dropped to ~82% fill rate and a larger
   profit gap relative to the MILP at full scale — solution quality degrades
-  as constraint violations reappear at larger problem sizes.
+  as constraint violations reappear at larger problem sizes. Per-date
+  decomposition improved this to 87.4% of the MILP's optimal profit
+  ($73,978,847.11 vs. $84,666,068.27), a meaningful recovery but still
+  below the 91-95% range seen at smaller scales.
 
 ## 4. Recommendations for Improving Scalability
 
@@ -196,12 +202,17 @@ per-(order, DC) reduced the coupled BQM from 617 to 367 variables and
 6,440 to 260 constraints at 20 orders, and eliminated the
 constraint-interaction bias entirely up to 100 orders. However, testing
 to full scale (1,109 orders) showed this fix has a real boundary — a
-small violation rate (~2%) reappears at that size. The generalizable
-takeaway is not "aggregation solves the problem," but "aggregation
-meaningfully raises the scale at which the problem occurs, and further
-scalability would require either per-constraint (rather than global)
-penalty tuning, or explicitly accepting and monitoring a small violation
-rate as a practical trade-off at very large scale.
+small violation rate (~2%) reappears at that size. Per-date decomposition
+(Section 2) further raises this boundary — from ~2% violations down to
+~0.5% — by exploiting the problem's actual constraint structure, though
+it does not eliminate the limitation entirely at the largest single
+date-buckets (>100-150 orders). The generalizable takeaway is not
+"aggregation solves the problem," but "aggregation and structure-aware
+decomposition together meaningfully raise the scale at which the problem
+occurs, and further scalability would require either per-constraint
+(rather than global) penalty tuning, secondary decomposition of oversized
+sub-problems, or explicitly accepting and monitoring a small violation
+rate as a practical trade-off at very large scale."
 
 **Recommendation 2 — time-boxed, gap-tolerant solving for MILP.** Given
 that MILP solve time grows super-linearly, requiring a proven-optimal
@@ -226,13 +237,18 @@ interaction bug diagnosed in Task 4 was fixed via constraint aggregation —
 scaled cleanly with linear solve time and zero violations up to 100
 orders, but testing to the full dataset revealed this fix has a genuine
 boundary: a small violation rate and a solve-time disadvantage reappear at
-full scale. Reporting this honestly, rather than stopping at the more
-favorable 100-order result, reflects the actual, tested behavior of both
-approaches: Testing to the full dataset first revealed a real boundary in the
-single-BQM approach (17-23 violations), but a targeted fix — decomposing
-by date, motivated by the problem's actual constraint structure — reduced
-this to 5 violations while also improving both solve time and profit. This
-demonstrates that the QUBO/BQM approach's scalability depends heavily on
-how the problem is decomposed, not solver effort alone, and that with
-appropriate decomposition it becomes a genuinely competitive alternative
-to the MILP even at full production scale.
+full scale.
+
+Reporting this honestly, rather than stopping at the more favorable
+100-order result, reflects the actual, tested behavior of both approaches.
+Per-date decomposition — motivated by the problem's actual constraint
+structure — meaningfully improved the full-scale QUBO/BQM result
+(violations down from 17-23 to 5, profit up ~$5M, solve time down
+~25-30%), but did not close the gap to the MILP: even decomposed, it
+remained both slower (589.4s vs. 410.2s) and further from optimal (87.4%
+of the MILP's profit) than at smaller scales. The honest conclusion is
+that decomposition is a genuinely useful scalability technique for this
+problem, not that it makes QUBO/BQM competitive with exact optimization at
+full production scale — that would require further work (e.g., secondary
+decomposition of the three oversized date-buckets) that was outside this
+project's scope.
