@@ -20,11 +20,9 @@ Three approaches were built and compared:
 ## Repository Structure
 ```
 nestle-dom/
-├── data/
-│ └── DOM-data/ # Anonymized challenge data pack
 ├── notebooks/
 │ └── 01_data_exploration.ipynb # All exploration, baselines, MILP,
-│ QUBO code — runnable top to bottom
+│ QUBO code and results
 ├── report/
 │ ├── 00_business_technical_summary.md # Task 1
 │ ├── 01_data_understanding.md # Task 2
@@ -36,6 +34,8 @@ nestle-dom/
 ├── requirements.txt
 └── README.md
 ```
+**Note:** the Nestlé DOM data pack (`data/DOM-data/`) is **not included**
+in this repository. See "Data Access" below.
 
 ## Setup
 
@@ -45,12 +45,30 @@ source venv/bin/activate      # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
+## Data Access
+
+This repository does not include the Nestlé DOM data pack, in line with
+the challenge's data privacy guidelines (public repositories should
+contain anonymized identifiers and aggregate metrics only, not the
+underlying restricted dataset). The data pack is available to registered
+participants via the WISER challenge workspace. Full documentation of the
+data schema, file structure, and how each field maps to the model is in
+`report/01_data_understanding.md`.
+
 ## How to Run
 
-Open `notebooks/01_data_exploration.ipynb` and run all cells top to bottom.
-The notebook is organized to follow the same order as the `report/` files
-above — data exploration and baselines first, then the MILP formulation,
-then the QUBO/quantum-inspired implementation and scaling tests.
+**With data pack access:** place the data pack at `data/DOM-data/`
+(matching the structure referenced in `report/01_data_understanding.md`),
+then open `notebooks/01_data_exploration.ipynb` and run all cells top to
+bottom. The notebook follows the same order as the `report/` files above —
+data exploration and baselines first, then the MILP formulation, then the
+QUBO/quantum-inspired implementation and scaling tests.
+
+**Without data pack access:** the notebook cannot be re-run end-to-end, but
+all code is fully visible and documented inline, and every result —
+including intermediate findings, bug diagnoses, and fixes — is written up
+in the `report/` folder. No code execution is required to review the
+methodology or verify the reported results.
 
 ## Key Results
 
@@ -80,12 +98,13 @@ defend all submitted work.
 
 ## Data & Privacy
 
-This repository uses only the anonymized challenge-approved Nestlé data
-pack. No raw operational data, customer identifiers, or confidential
-distribution-center details are published. Where external tools (Claude,
-D-Wave Ocean SDK's local samplers) were used, only anonymized, aggregated
-model coefficients were involved — no raw order-level data was transmitted
-to any external service.
+This project uses only the anonymized challenge-approved Nestlé data pack,
+which is not included in this repository (see "Data Access" above). No
+raw operational data, customer identifiers, or confidential
+distribution-center details are published here. Where external tools
+(Claude, D-Wave Ocean SDK's local samplers) were used, only anonymized,
+aggregated model coefficients were involved — no raw order-level data was
+transmitted to any external service.
 
 ## Author
 
