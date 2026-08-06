@@ -106,7 +106,37 @@ distribution-center details are published here. Where external tools
 aggregated model coefficients were involved — no raw order-level data was
 transmitted to any external service.
 
+## Resources & Acknowledgments
+
+- **Nestlé DOM Equations document** — Nestlé's own documented DOM
+  proof-of-concept formulation, provided as part of the challenge data
+  pack, used as a reference point for the MILP formulation in this project
+  (see `report/03_formulation.md`).
+- **PuLP documentation** — https://coin-or.github.io/pulp/ — used for
+  MILP model construction (variables, constraints, objective).
+- **Google OR-Tools documentation** — https://developers.google.com/optimization
+  — referenced for assignment-problem formulation patterns.
+- **Cornuéjols & Trick, "A Tutorial on Integer Programming"** — used as
+  background reading on integer programming fundamentals (assignment
+  problems, set covering).
+- **D-Wave Ocean SDK / dimod documentation** — https://docs.ocean.dwavesys.com/
+  — used for QUBO/BQM/CQM construction, `cqm_to_bqm` conversion, and
+  Simulated Annealing / Tabu Search samplers.
+- **Claude (Anthropic)** — used throughout for code generation, debugging
+  assistance, and documentation drafting (see AI Tool Disclosure above).
+
+All external resources were used for learning and implementation guidance;
+all code was written, tested, and understood by the author.
+
 ## Author
 
 Sishir Katepalli — B.Tech Computer Science and Engineering, Amrita School
 of Engineering, Chennai
+
+## Demo Video
+
+A ~5-minute walkthrough of the project, covering the problem, the three
+solution approaches compared, the full-scale MILP result, and the QUBO
+scaling limitation we found and partially fixed via date-decomposition.
+
+📺 [[Watch the demo]](https://drive.google.com/file/d/1JiIpjZomeQyepyelyJefOTLXmU1rA6Ep/view?usp=sharing)
